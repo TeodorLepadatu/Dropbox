@@ -81,7 +81,8 @@ int main()
         pid = fork();
         if(pid == 0) // aici copilul va face legatura cu sistemul local de fisiere
         {
-            if (strcmp(argv[1], "cp") == 0 || strcmp(argv[1], "ls") == 0 ||  strcmp(argv[1], "mkdir") == 0 || strcmp(argv[1], "mv") == 0) 
+            if (strcmp(argv[1], "cp") == 0 || strcmp(argv[1], "ls") == 0 || 
+                strcmp(argv[1], "mkdir") == 0 || strcmp(argv[1], "mv") == 0) 
             {
                 // mv a.txt test/a.txt
                 // mv a.txt test/
