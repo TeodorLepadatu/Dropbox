@@ -16,7 +16,7 @@ int main()
         char comanda[MAX_INPUT];
 
         argv[0] = "./dbxcli-linux-amd64"; 
-        printf(">> ");
+        printf("dropbox >> ");
         fgets(comanda, MAX_INPUT, stdin);
 
         comanda[strcspn(comanda, "\n")] = '\0'; 
@@ -37,89 +37,111 @@ int main()
             p = strtok(NULL, " ");
             i++;
         }
-        if (argv[1] == '\0') 
+        
+        if (i == 1) // daca nu a fost introdus nimic - `a fost apasat enter` nu se intampla nimic 
         {
             continue;
         }
-        argv[i] = NULL;
-        if (argv[1] && strcmp(argv[1], "exit") == 0) 
+
+        argv[i] = NULL; // ULtimul argument din argv este NULL
+        
+        if (strcmp(argv[1], "exit") == 0) 
         {
-            for (int j = 1; j < i; j++) {
+            for (int j = 1; j < i; j++) 
+            {
                 free(argv[j]);
-            }
-            break;
-        }
-
-        pid_t pid = fork();
-        if (pid == 0) 
-        {
-            char* envp[] = {"PATH=/usr/bin:/bin:/usr/local/bin", NULL};
-
-            execve(argv[0], argv, envp);
-
-            perror("execve (dbxcli)");
-            return 1;
-        }
-        else if (pid > 0) 
-        {
-            int status;
-            waitpid(pid, &status, 0); 
-        }
-
-        pid_t local_pid = fork();
-        if (local_pid == 0) 
-        {
-            if (strcmp(argv[1], "cp") == 0 || strcmp(argv[1], "ls") == 0 || 
-                strcmp(argv[1], "mkdir") == 0 || strcmp(argv[1], "mv") == 0) 
-            {
-                char local_command[MAX_INPUT] = {0};
-                for (int j = 1; argv[j]; j++) {
-                    strcat(local_command, argv[j]);
-                    strcat(local_command, " ");
-                }
-
-                execl("/bin/sh", "/bin/sh", "-c", local_command, (char*)NULL);
-                perror("execve (local command)");
-                return 1;
-            }
-            else if (strcmp(argv[1], "search") == 0) 
-            {
-                char find_command[MAX_INPUT] = "find ";
-                if (argv[2]) 
-                {
-                    strcat(find_command, argv[2]); 
-                } 
-                else 
-                {
-                    strcat(find_command, "."); 
-                }
-
-                strcat(find_command, " -name \"");
-                if (argv[3]) 
-                {
-                    strcat(find_command, argv[3]); 
-                } 
-                else 
-                {
-                    strcat(find_command, "*"); 
-                }
-                strcat(find_command, "\"");
-
-                execl("/bin/sh", "/bin/sh", "-c", find_command, (char*)NULL);
-                perror("execve (local search)");
-                return 1;
             }
             return 0;
         }
-        else if (local_pid > 0) 
+
+        pid_t pid = fork();
+        if (pid == 0) // aici copilul va executa comenzile in dbxcli
         {
-            int status;
-            waitpid(local_pid, &status, 0); 
+            char* envp[] = {"PATH=/usr/bin/", NULL};
+
+            if(strcmp(argv[1], "create") != 0)
+            {
+                if(execve(argv[0], argv, envp) == -1)
+                {
+                    perror("dropbox >> Fatal error\n");
+                    return 1;
+                }
+            }
+        }
+        else if (pid > 0) // parinte
+        {
+            wait(NULL);
+        }
+        else
+        {
+            perror("dropbox >> Fatal error\n");
+            return 1;
         }
 
-        for (int j = 1; j < i; j++) {
-            free(argv[j]);
+        pid = fork();
+        if(pid == 0) // aici copilul va face legatura cu sistemul local de fisiere
+        {
+            if (strcmp(argv[1], "cp") == 0 || strcmp(argv[1], "ls") == 0 ||  strcmp(argv[1], "mkdir") == 0 || strcmp(argv[1], "mv") == 0) 
+            {
+                // mv a.txt test/a.txt
+                // mv a.txt test/
+
+                char bin_path[] = "/usr/bin/";
+                strcat(bin_path, argv[1]);
+
+                char* local_argv[MAX_INPUT] = { argv[1] };
+
+                int j;
+                for (j = 2; argv[j]; j++) 
+                {
+                    local_argv[j - 1] = argv[j];
+                }
+                local_argv[j] = NULL;
+
+                if(execve(bin_path, local_argv, NULL) == -1)
+                {
+                    perror("dropbox >> Fatal error\n");
+                    return 1;
+                }
+            }
+            else if (strcmp(argv[1], "create") == 0)
+            {
+                char bin_path[] = "/usr/bin/touch";
+
+                char* local_argv[MAX_INPUT] = { "touch", argv[2], NULL };
+
+                if(execve(bin_path, local_argv, NULL) == -1)
+                {
+                    perror("dropbox >> Fatal error\n");
+                    return 1;
+                }
+            }
+            else if (strcmp(argv[1], "search") == 0) 
+            {
+                char bin_path[] = "/usr/bin/find";
+
+                char* file_to_find = argv[3];
+                char* path_to_find = argv[2];
+                char* local_argv[MAX_INPUT] = { "find", path_to_find, "-name ", file_to_find, NULL };
+
+                if(execve(bin_path, local_argv, NULL) == -1)
+                {
+                    perror("dropbox >> Fatal error\n");
+                    return 1;
+                }
+            }
         }
+        else if(pid > 0)
+        {
+            wait(NULL);
+        }
+        else
+        {
+            perror("dropbox >> Fatal error\n");
+            return 1;
+        }
+
+        fflush(stdout);
     }
 
     return 0;
