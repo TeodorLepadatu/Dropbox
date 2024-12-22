@@ -65,13 +65,13 @@ Aplicația va lansa procesele corespunzătoare pentru fiecare comandă și va a�
 2. **Construirea aplicației:**
    - Compilează aplicația folosind un compilator C standard:
      ```
-     gcc -o shell_program shell_program.c
+     gcc -o db db.c
      ```
 
 3. **Execută aplicația:**
    - Rularea aplicației poate fi făcută simplu prin:
      ```
-     ./shell_program
+     ./db
      ```
 
 4. **Interacțiunea cu shell-ul:**
@@ -82,38 +82,24 @@ Aplicația va lansa procesele corespunzătoare pentru fiecare comandă și va a�
 ### Copiere fișier din Dropbox în sistemul local:
 cp /Dropbox/fisier.txt /home/utilizator/fisier_local.txt
 
-shell
-Copy code
 
 ### Mutare fișier din sistemul local în Dropbox:
 mv /home/utilizator/fisier_local.txt /Dropbox/
 
-shell
-Copy code
 
 ### Creare director pe Dropbox:
 mkdir /Dropbox/nou_director
 
-shell
-Copy code
-
 ### Listare fișiere dintr-un director pe Dropbox:
 ls /Dropbox/
 
-shell
-Copy code
 
 ### Căutare fișier în Dropbox:
 search "document.txt" /Dropbox/
 
-shell
-Copy code
-
 ### Ștergere fișier din Dropbox:
 rm /Dropbox/fisier_de_șters.txt
 
-markdown
-Copy code
 
 ## Considerații
 
