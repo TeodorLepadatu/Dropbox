@@ -1,32 +1,43 @@
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdlib.h>
+
+#define MAX_INPUT 200
+#define MAX_ARGS 100
 
 int main() 
 {
-    while (1)
+    while (1) 
     {
-        char comanda[100];
+        char* argv[MAX_ARGS];
+        char comanda[MAX_INPUT];
 
-        printf("db >> ");
-        scanf("%s", comanda);
+        argv[0] = "dbxcli-linux-amd64";
 
-        pid_t pid = fork();
+        fgets(comanda, MAX_INPUT, stdin);
 
-        if (pid == 0)
+        comanda[strcspn(comanda, "\n")] = '\0';
+
+        char* p = strtok(comanda, " ");
+        int i = 1;
+
+        while (p) 
         {
-            char* argv[] = {"dbxcli-linux-amd64", comanda, NULL};
-            char* envp[] = {"PATH=/usr/bin:/bin:/usr/local/bin", NULL};
+            argv[i] = malloc(strlen(p) + 1);
+            strcpy(argv[i], p);
+            p = strtok(NULL, " ");
+            i++;
+        }
 
-            execve("/home/bogdan/Desktop/dbxcli/dbxcli-linux-amd64", argv, envp);
-            return 1;
+        argv[i] = NULL;
+
+        for (int a = 0; a < i; a++) {
+            printf("%s\n", argv[a]);
         }
-        else if (pid > 0)
-        {
-            int status;
-            waitpid(pid, &status, 0);
+
+        for (int j = 1; j < i; j++) {
+            free(argv[j]);
         }
-        
     }
 
     return 0;
