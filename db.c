@@ -20,7 +20,13 @@ int main()
 
         char* p = strtok(comanda, " ");
         int i = 1;
-
+        /*
+            dbxcli cp [flags] <source> [more sources] <target>
+            dbxcli ls [flags] [<path>]
+            dbxcli mkdir [flags] <directory>
+            dbxcli mv [flags] <source> <target>
+            dbxcli search [flags] <query> [path-scope] =>>> in linux este cu find
+        */
         while (p) 
         {
             argv[i] = malloc(strlen(p) + 1);
@@ -31,8 +37,17 @@ int main()
 
         argv[i] = NULL;
 
-        for (int a = 0; a < i; a++) {
-            printf("%s\n", argv[a]);
+        pid_t pid = fork();
+        if (pid == 0)
+        {
+            char* envp[] = {"PATH=/usr/bin:/bin:/usr/local/bin", NULL};
+            execve("./dbxcli-linux-amd64", argv, envp);
+            return 1;
+        }
+        else if (pid > 0)
+        {
+            int status;
+            waitpid(pid, &status, 0);
         }
 
         for (int j = 1; j < i; j++) {
