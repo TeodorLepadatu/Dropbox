@@ -65,7 +65,7 @@ Aplicația va lansa procesele corespunzătoare pentru fiecare comandă și va a�
 2. **Construirea aplicației:**
    - Compilează aplicația folosind un compilator C standard:
      ```
-     gcc -o db db.c
+     gcc db.c -o db
      ```
 
 3. **Execută aplicația:**
