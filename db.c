@@ -59,7 +59,7 @@ int main()
         {
             char* envp[] = {"PATH=/usr/bin/", NULL};
 
-            if(strcmp(argv[1], "create") != 0)
+            if(strcmp(argv[1], "create") != 0) // dbxcli nu are comanda de `create`
             {
                 if(execve(argv[0], argv, envp) == -1)
                 {
@@ -89,15 +89,20 @@ int main()
 
                 char bin_path[] = "/usr/bin/";
                 strcat(bin_path, argv[1]);
+                // bin_path = "/usr/bin/{cp/mkdir/ls/mv}"
 
-                char* local_argv[MAX_INPUT] = { argv[1] };
+                char* local_argv[MAX_INPUT] = { argv[1] }; 
+                // local_argv = { "cp/ls/mv/mkdir" }
 
                 int j;
                 for (j = 2; argv[j]; j++) 
                 {
                     local_argv[j - 1] = argv[j];
                 }
+                // local_argv = { "cp/ls/mv/mkdir", "arg_1", "arg_2", ..., "arg_n" }
+
                 local_argv[j] = NULL;
+                // local_argv = { "cp/ls/mv/mkdir", "arg_1", "arg_2", ..., "arg_n", NULL }
 
                 if(execve(bin_path, local_argv, NULL) == -1)
                 {
@@ -109,7 +114,7 @@ int main()
             {
                 char bin_path[] = "/usr/bin/touch";
 
-                char* local_argv[MAX_INPUT] = { "touch", argv[2], NULL };
+                char* local_argv[MAX_INPUT] = { "touch", argv[2], NULL }; // local_argv = { "touch", "nume_fisier", NULL }
 
                 if(execve(bin_path, local_argv, NULL) == -1)
                 {
@@ -124,6 +129,7 @@ int main()
                 char* file_to_find = argv[3];
                 char* path_to_find = argv[2];
                 char* local_argv[MAX_INPUT] = { "find", path_to_find, "-name ", file_to_find, NULL };
+                // local_argv = { "find", "un/path", "-name", "nume_fisier", NULL }
 
                 if(execve(bin_path, local_argv, NULL) == -1)
                 {
