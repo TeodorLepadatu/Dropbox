@@ -59,7 +59,7 @@ int main()
         {
             char* envp[] = {"PATH=/usr/bin/", NULL};
 
-            if(strcmp(argv[1], "create") != 0) // dbxcli nu are comanda de create
+            if(strcmp(argv[1], "create") != 0) // dbxcli nu are comanda de create, si atunci va trebui sa dau put ca sa dau upload in dropbox
             {
                 if(execve(argv[0], argv, envp) == -1)
                 {
