@@ -38,7 +38,7 @@ int main()
             i++;
         }
         
-        if (i == 1) // daca nu a fost introdus nimic - `a fost apasat enter` nu se intampla nimic 
+        if (i == 1) // daca nu a fost introdus nimic - a fost apasat enter nu se intampla nimic 
         {
             continue;
         }
@@ -59,7 +59,7 @@ int main()
         {
             char* envp[] = {"PATH=/usr/bin/", NULL};
 
-            if(strcmp(argv[1], "create") != 0) // dbxcli nu are comanda de `create`
+            if(strcmp(argv[1], "create") != 0) // dbxcli nu are comanda de create
             {
                 if(execve(argv[0], argv, envp) == -1)
                 {
@@ -126,16 +126,36 @@ int main()
             {
                 char bin_path[] = "/usr/bin/find";
 
-                char* file_to_find = argv[3];
-                char* path_to_find = argv[2];
-                char* local_argv[MAX_INPUT] = { "find", path_to_find, "-name ", file_to_find, NULL };
-                // local_argv = { "find", "un/path", "-name", "nume_fisier", NULL }
+                char* file_to_find = argv[2];
+                char* path_to_find;
+                if(strlen(argv[3]) == 1 && argv[3][0] == '/') {
+                	path_to_find = argv[3];
+        	
+        		
+                	char* local_argv[MAX_INPUT] = { "find", file_to_find, NULL };
+                	// local_argv = { "find", "un/path", "-name", "nume_fisier", NULL }
+        	
+				
+		        if(execve(bin_path, local_argv, NULL) == -1)
+		        {
+		            perror("dropbox >> Fatal error\n");
+		            return 1;
+		        }
+        	}
+        	else {
+        		path_to_find = argv[3] + 1;
+        	
+        		
+                	char* local_argv[MAX_INPUT] = { "find", path_to_find, "-name", file_to_find, NULL };
+                	// local_argv = { "find", "un/path", "-name", "nume_fisier", NULL }
 
-                if(execve(bin_path, local_argv, NULL) == -1)
-                {
-                    perror("dropbox >> Fatal error\n");
-                    return 1;
-                }
+				
+		        if(execve(bin_path, local_argv, NULL) == -1)
+		        {
+		            perror("dropbox >> Fatal error\n");
+		            return 1;
+		        }
+        	}
             }
         }
         else if(pid > 0)
@@ -147,9 +167,7 @@ int main()
             perror("dropbox >> Fatal error\n");
             return 1;
         }
-
-        fflush(stdout);
     }
 
-    return 0;
+    return 0;
 }
